@@ -1,3 +1,4 @@
+require 'bundler'
 require 'parser/current'
 require 'unparser'
 
