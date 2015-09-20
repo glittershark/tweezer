@@ -3,3 +3,11 @@ language: ruby
 rvm:
   - 2.2.2
 before_install: gem install bundler -v 1.10.6
+deploy:
+  provider: rubygems
+  api_key:
+    secure: zkccSICCWfIfzaJWRdb04cR4K7LcRdN96Bx/RKsdmKahza8o7Yu8eRL+yadW5w+Td9iujVcvtGBLcvyJg5NzXFv52ZJERhEW10MGIXYvbRNTwPjioP2PNYFp3xEwnQ4ELS6lITQKEt9odL7VrDkSUUcqVx9+EgMximQqPJCBRLJi6EtOPzvSrp794kt7LMwxJItDTnA7QyXk55iiR93irCB6iy64r0SKtFKsqmUnCsMCK+0Yky0or7Y/fU/+TRK2lkq2qKRt+iZf+EtEPOxoUQiICKFOPc31XR5ln6ZQF43Fvg0jLjfJ0p4DBwyhY9c1OBjK8PRzvKdTPjpq5MFgYWPk9C0xC5ZZI+BteQZowXe52tkTUKP1Px0c1Tx9bsoQW9N5dNlMuse19WlulK1G8kZ3gWWPKE5MGpMQgVGQq8CKSkUmwwBeLGvS5+yFCNOU52X8zVp9PRs4g3cdoauSdXMi+fewCRnIsp+ONJJw3V3IQVRIDoGv81ZO/TECsmDiVOv7AqzR1eG2Mc9PRrFCa7wUOfKG8fL23ZsYMLVct3VtN8TOYwEKtYY+vNM25Rsbxvbx1Q7qN5oywySS5jaKBrYkUmbfqEW6UOCqA/Nu+41OwehfgN74NkiOWDoIhVjHLrJlbuQR0Vzg9zw6s00lIQnY+MyZplsDQ4XvVZy2DDA=
+  gem: tweezer
+  on:
+    tags: true
+    repo: glittershark/tweezer
