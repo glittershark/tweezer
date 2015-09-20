@@ -27,6 +27,22 @@ gem "test2", "~> 1.0"
     end
   end
 
+  describe '#add_gem' do
+    subject { described_class.new(basic_gemfile) }
+
+    before do
+      subject.add_gem 'tweezer'
+    end
+
+    it 'adds the gem to the #gems array' do
+      expect(subject.gems.last.name).to eq 'tweezer'
+    end
+
+    it "adds the gem's node to the AST" do
+      expect(subject.dump).to include 'gem "tweezer"'
+    end
+  end
+
   describe '#dump' do
     context 'for a basic gemfile' do
       subject { described_class.new(basic_gemfile).dump }
