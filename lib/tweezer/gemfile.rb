@@ -12,11 +12,11 @@ module Tweezer
     end
 
     def dump
-      Unparser.unparse(ast)
+      Unparser.unparse(ast, comments)
     end
 
     private
 
-    attr_reader :ast
+    attr_reader :ast, :comments
   end
 end

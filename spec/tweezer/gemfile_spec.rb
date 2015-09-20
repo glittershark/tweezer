@@ -1,15 +1,24 @@
 require 'spec_helper'
 
 describe Tweezer::Gemfile do
-  let(:basic_source) do
+  let(:basic_gemfile) do
     <<-RUBY.strip
 gem "test1"
 gem "test2", "~> 1.0"
     RUBY
   end
 
+  let(:gemfile_with_comments) do
+    <<-RUBY.strip
+# the 'test1' gem
+gem "test1"
+# the 'test2' gem
+gem "test2", "~> 1.0"
+    RUBY
+  end
+
   describe '#gems' do
-    subject { described_class.new(basic_source).gems }
+    subject { described_class.new(basic_gemfile).gems }
     it { is_expected.to have(2).items }
     it { is_expected.to all(be_a Tweezer::Gem) }
 
@@ -19,7 +28,14 @@ gem "test2", "~> 1.0"
   end
 
   describe '#dump' do
-    subject { described_class.new(basic_source).dump }
-    it { is_expected.to eq basic_source }
+    context 'for a basic gemfile' do
+      subject { described_class.new(basic_gemfile).dump }
+      it { is_expected.to eq basic_gemfile }
+    end
+
+    context 'for a gemfile with comments' do
+      subject { described_class.new(gemfile_with_comments).dump }
+      it { is_expected.to eq gemfile_with_comments }
+    end
   end
 end
