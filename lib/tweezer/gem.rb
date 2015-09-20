@@ -14,6 +14,13 @@ module Tweezer
       end
     end
 
+    def to_node
+      Parser::AST::Node.new(
+        :send,
+        [nil, :gem, Parser::AST::Node.new(:str, [name])]
+      )
+    end
+
     attr_reader :name, :version
 
     private
