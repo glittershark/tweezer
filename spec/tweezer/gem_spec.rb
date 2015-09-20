@@ -61,4 +61,18 @@ describe Tweezer::Gem do
       end
     end
   end
+
+  describe '.gem_node?' do
+    context 'with a gem node' do
+      let(:node) { Parser::CurrentRuby.parse('gem "test"') }
+      subject { described_class.gem_node?(node) }
+      it { is_expected.to be true }
+    end
+
+    context 'with a non-gem node' do
+      let(:node) { Parser::CurrentRuby.parse('ruby "2.2.0"') }
+      subject { described_class.gem_node?(node) }
+      it { is_expected.to be false }
+    end
+  end
 end

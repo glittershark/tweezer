@@ -21,12 +21,17 @@ module Tweezer
       Parser::AST::Node.new(:send, args)
     end
 
+    def self.gem_node?(node)
+      node.children[1] == :gem
+    end
+
     attr_reader :name, :version
 
     private
 
     def check_node!(node)
-      fail ArgumentError, 'Not a call to `gem`' if node.children[1] != :gem
+      return if self.class.gem_node?(node)
+      fail ArgumentError, "Not a call to `gem`: #{node.inspect}"
     end
   end
 end

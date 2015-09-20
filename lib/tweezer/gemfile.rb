@@ -8,7 +8,10 @@ module Tweezer
     end
 
     def gems
-      @gems ||= @ast.children.map { |child| Gem.new(child) }
+      @gems ||= @ast.children.map do |node|
+        next unless Gem.gem_node? node
+        Gem.new(node)
+      end.compact
     end
 
     def add_gem(*args)

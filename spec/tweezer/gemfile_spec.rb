@@ -1,29 +1,38 @@
 require 'spec_helper'
 
 describe Tweezer::Gemfile do
-  let(:basic_gemfile) do
-    <<-RUBY.strip
+  basic_gemfile = <<-RUBY.strip
 gem "test1"
 gem "test2", "~> 1.0"
-    RUBY
-  end
+  RUBY
 
-  let(:gemfile_with_comments) do
-    <<-RUBY.strip
+  gemfile_with_comments = <<-RUBY.strip
 # the 'test1' gem
 gem "test1"
 # the 'test2' gem
 gem "test2", "~> 1.0"
-    RUBY
-  end
+  RUBY
+
+  gemfile_with_ruby = <<-RUBY.strip
+ruby "2.2.2"
+gem "test"
+  RUBY
 
   describe '#gems' do
-    subject { described_class.new(basic_gemfile).gems }
-    it { is_expected.to have(2).items }
-    it { is_expected.to all(be_a Tweezer::Gem) }
+    context 'for a basic gemfile' do
+      subject { described_class.new(basic_gemfile).gems }
+      it { is_expected.to have(2).items }
+      it { is_expected.to all(be_a Tweezer::Gem) }
 
-    it 'returns the correct gems' do
-      expect(subject.map(&:name)).to eq %w(test1 test2)
+      it 'returns the correct gems' do
+        expect(subject.map(&:name)).to eq %w(test1 test2)
+      end
+    end
+
+    context 'for a gemfile with a ruby version declaration' do
+      subject { described_class.new(gemfile_with_ruby).gems }
+      it { is_expected.to have(1).item }
+      it { is_expected.to all(be_a Tweezer::Gem) }
     end
   end
 
@@ -57,14 +66,15 @@ gem "test2", "~> 1.0"
   end
 
   describe '#dump' do
-    context 'for a basic gemfile' do
-      subject { described_class.new(basic_gemfile).dump }
-      it { is_expected.to eq basic_gemfile }
-    end
-
-    context 'for a gemfile with comments' do
-      subject { described_class.new(gemfile_with_comments).dump }
-      it { is_expected.to eq gemfile_with_comments }
+    {
+      'basic gemfile' => basic_gemfile,
+      'gemfile with comments' => gemfile_with_comments,
+      'gemfile with a ruby version' => gemfile_with_ruby
+    }.each do |name, source|
+      context "for a #{name}" do
+        subject { described_class.new(source).dump }
+        it { is_expected.to eq source }
+      end
     end
   end
 end
