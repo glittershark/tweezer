@@ -1,5 +1,6 @@
 require 'set'
 require 'tweezer/version'
+require 'tweezer/errors'
 require 'tweezer/gemfile'
 require 'tweezer/gem'
 require 'tweezer/unparser/emitter/unparenthesized_arguments'

@@ -21,6 +21,11 @@ module Tweezer
       Parser::AST::Node.new(:send, args)
     end
 
+    def ==(other)
+      name == other.name &&
+        version == other.version
+    end
+
     def self.gem_node?(node)
       node.children[1] == :gem
     end

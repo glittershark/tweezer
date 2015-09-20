@@ -16,6 +16,7 @@ module Tweezer
 
     def add_gem(*args)
       gem = Gem.new(*args)
+      fail GemAlreadyPresent if gems.include? gem
       gems << gem
       @ast = @ast.append(gem.to_node)
     end

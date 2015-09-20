@@ -63,6 +63,13 @@ gem "test"
         expect(subject.dump).to include 'gem "tweezer", "~> 1.0.0"'
       end
     end
+
+    context "with a gem that's already present" do
+      it 'raises a GemAlreadyPresent error' do
+        expect { subject.add_gem('test1') }.to raise_error(
+          Tweezer::GemAlreadyPresent)
+      end
+    end
   end
 
   describe '#dump' do

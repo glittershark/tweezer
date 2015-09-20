@@ -62,6 +62,22 @@ describe Tweezer::Gem do
     end
   end
 
+  describe '#==' do
+    subject { described_class.new('tweezer', '~> 1.0.0') }
+
+    context 'with two equal gems' do
+      it { is_expected.to eq described_class.new('tweezer', '~> 1.0.0') }
+    end
+
+    context 'when the versions differ' do
+      it { is_expected.to_not eq described_class.new('tweezer', '~> 1.0.1') }
+    end
+
+    context 'when the names differ' do
+      it { is_expected.to_not eq described_class.new('foobar', '~> 1.0.0') }
+    end
+  end
+
   describe '.gem_node?' do
     context 'with a gem node' do
       let(:node) { Parser::CurrentRuby.parse('gem "test"') }
