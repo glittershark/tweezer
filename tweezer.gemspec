@@ -27,9 +27,10 @@ Gem::Specification.new do |spec|
   spec.require_paths = ['lib']
 
   spec.add_dependency 'parser', '~> 2.2'
+  spec.add_dependency 'thor', '~> 0.19'
   spec.add_dependency 'unparser', '~> 0.2'
+  spec.add_dependency 'bundler', '~> 1.10'
 
-  spec.add_development_dependency 'bundler', '~> 1.10'
   spec.add_development_dependency 'rake', '~> 10.0'
   spec.add_development_dependency 'rspec', '~> 3.3'
   spec.add_development_dependency 'rspec-its', '~> 1.2'

@@ -1,3 +1,5 @@
+require 'unparser'
+
 module Unparser
   class Emitter
     class UnparenthesizedArguments < Unparser::Emitter::Send::Arguments

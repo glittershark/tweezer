@@ -1,10 +1,4 @@
 require 'set'
-require 'tweezer/version'
-require 'tweezer/errors'
-require 'tweezer/gemfile'
-require 'tweezer/gem'
-require 'tweezer/unparser/emitter/unparenthesized_arguments'
-require 'tweezer/unparser/emitter/send/regular'
 
 module Tweezer
   UNPARENTHESIZED_METHODS = Set[*%i(source ruby git path group platforms gem)]
@@ -13,3 +7,12 @@ module Tweezer
     UNPARENTHESIZED_METHODS.include?(method)
   end
 end
+
+require 'unparser'
+require 'tweezer/unparser/emitter/unparenthesized_arguments'
+require 'tweezer/unparser/emitter/send/regular'
+require 'tweezer/version'
+require 'tweezer/errors'
+require 'tweezer/gem'
+require 'tweezer/gemfile'
+require 'tweezer/cli'

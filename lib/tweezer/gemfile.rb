@@ -3,8 +3,18 @@ require 'unparser'
 
 module Tweezer
   class Gemfile
-    def initialize(source)
-      @ast, @comments = Parser::CurrentRuby.parse_with_comments(source)
+    def initialize(source, file = nil)
+      @ast, @comments = Parser::CurrentRuby.parse_with_comments(source, file)
+      @file = file
+    end
+
+    def self.load(file = Bundler.default_gemfile)
+      new(File.read(file), file)
+    end
+
+    def save!
+      fail unless @file
+      File.write(@file, dump)
     end
 
     def gems
