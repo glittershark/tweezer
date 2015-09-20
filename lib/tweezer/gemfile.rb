@@ -11,8 +11,8 @@ module Tweezer
       @gems ||= @ast.children.map { |child| Gem.new(child) }
     end
 
-    def add_gem(name)
-      gem = Gem.new(name)
+    def add_gem(*args)
+      gem = Gem.new(*args)
       gems << gem
       @ast = @ast.append(gem.to_node)
     end

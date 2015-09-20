@@ -43,5 +43,22 @@ describe Tweezer::Gem do
         expect(subject.children[2].children[0]).to eq 'tweezer'
       end
     end
+
+    context 'with a name and a version' do
+      subject { described_class.new('tweezer', '~> 1.0.0').to_node }
+      its(:type) { is_expected.to eq :send }
+
+      it 'calls the `gem` method' do
+        expect(subject.children[1]).to eq :gem
+      end
+
+      it 'calls the gem method with the name of the gem' do
+        expect(subject.children[2].children[0]).to eq 'tweezer'
+      end
+
+      it "calls the gem method with the gem's version as the second argument" do
+        expect(subject.children[3].children[0]).to eq '~> 1.0.0'
+      end
+    end
   end
 end

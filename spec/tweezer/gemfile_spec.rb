@@ -30,16 +30,29 @@ gem "test2", "~> 1.0"
   describe '#add_gem' do
     subject { described_class.new(basic_gemfile) }
 
-    before do
-      subject.add_gem 'tweezer'
+    context 'with just a name' do
+      before { subject.add_gem 'tweezer' }
+
+      it 'adds the gem to the #gems array' do
+        expect(subject.gems.last.name).to eq 'tweezer'
+      end
+
+      it "adds the gem's node to the AST" do
+        expect(subject.dump).to include 'gem "tweezer"'
+      end
     end
 
-    it 'adds the gem to the #gems array' do
-      expect(subject.gems.last.name).to eq 'tweezer'
-    end
+    context 'with a name and a version' do
+      before { subject.add_gem 'tweezer', '~> 1.0.0' }
 
-    it "adds the gem's node to the AST" do
-      expect(subject.dump).to include 'gem "tweezer"'
+      it 'adds the gem with the version to the #gems array' do
+        expect(subject.gems.last).to have_attributes name: 'tweezer',
+                                                     version: '~> 1.0.0'
+      end
+
+      it "adds the gem's node to the AST" do
+        expect(subject.dump).to include 'gem "tweezer", "~> 1.0.0"'
+      end
     end
   end
 

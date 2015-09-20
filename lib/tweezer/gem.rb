@@ -15,10 +15,10 @@ module Tweezer
     end
 
     def to_node
-      Parser::AST::Node.new(
-        :send,
-        [nil, :gem, Parser::AST::Node.new(:str, [name])]
-      )
+      args = [nil, :gem, Parser::AST::Node.new(:str, [name])]
+      args << Parser::AST::Node.new(:str, [version]) if version
+
+      Parser::AST::Node.new(:send, args)
     end
 
     attr_reader :name, :version
