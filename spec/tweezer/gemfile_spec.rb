@@ -2,20 +2,20 @@ require 'spec_helper'
 
 describe Tweezer::Gemfile do
   basic_gemfile = <<-RUBY.strip
-gem "test1"
-gem "test2", "~> 1.0"
+gem 'test1'
+gem 'test2', '~> 1.0'
   RUBY
 
   gemfile_with_comments = <<-RUBY.strip
 # the 'test1' gem
-gem "test1"
+gem 'test1'
 # the 'test2' gem
-gem "test2", "~> 1.0"
+gem 'test2', '~> 1.0'
   RUBY
 
   gemfile_with_ruby = <<-RUBY.strip
-ruby "2.2.2"
-gem "test"
+ruby '2.2.2'
+gem 'test'
   RUBY
 
   describe '#gems' do
@@ -47,7 +47,7 @@ gem "test"
       end
 
       it "adds the gem's node to the AST" do
-        expect(subject.dump).to include 'gem "tweezer"'
+        expect(subject.dump).to include "gem 'tweezer'"
       end
     end
 
@@ -60,7 +60,7 @@ gem "test"
       end
 
       it "adds the gem's node to the AST" do
-        expect(subject.dump).to include 'gem "tweezer", "~> 1.0.0"'
+        expect(subject.dump).to include "gem 'tweezer', '~> 1.0.0'"
       end
     end
 
