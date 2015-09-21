@@ -9,6 +9,8 @@ module Tweezer
 end
 
 require 'unparser'
+require 'tweezer/unparser/buffer'
+require 'tweezer/unparser/emitter'
 require 'tweezer/unparser/emitter/literal/primitive/inspect'
 require 'tweezer/unparser/emitter/send/regular'
 require 'tweezer/unparser/emitter/unparenthesized_arguments'

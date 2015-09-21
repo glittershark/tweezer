@@ -13,6 +13,12 @@ gem 'test1'
 gem 'test2', '~> 1.0'
   RUBY
 
+  gemfile_with_newline = <<-RUBY.strip
+gem 'test1'
+
+gem 'test2', '~> 1.0'
+  RUBY
+
   gemfile_with_ruby = <<-RUBY.strip
 ruby '2.2.2'
 gem 'test'
@@ -76,6 +82,7 @@ gem 'test'
     {
       'basic gemfile' => basic_gemfile,
       'gemfile with comments' => gemfile_with_comments,
+      'gemfile with newlines' => gemfile_with_newline,
       'gemfile with a ruby version' => gemfile_with_ruby
     }.each do |name, source|
       context "for a #{name}" do
