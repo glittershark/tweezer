@@ -1,37 +1,37 @@
 require 'spec_helper'
 
 describe Tweezer::Gemfile do
-  basic_gemfile = <<-RUBY.strip
-gem 'test1'
-gem 'test2', '~> 1.0'
+  basic_gemfile = <<-RUBY.strip_heredoc.strip
+    gem 'test1'
+    gem 'test2', '~> 1.0'
   RUBY
 
-  gemfile_with_comments = <<-RUBY.strip
-# the 'test1' gem
-gem 'test1'
-# the 'test2' gem
-gem 'test2', '~> 1.0'
+  gemfile_with_comments = <<-RUBY.strip_heredoc.strip
+    # the 'test1' gem
+    gem 'test1'
+    # the 'test2' gem
+    gem 'test2', '~> 1.0'
   RUBY
 
-  gemfile_with_newline = <<-RUBY.strip
-gem 'test1'
+  gemfile_with_newline = <<-RUBY.strip_heredoc.strip
+    gem 'test1'
 
-gem 'test2', '~> 1.0'
+    gem 'test2', '~> 1.0'
   RUBY
 
-  gemfile_with_ruby = <<-RUBY.strip
-ruby '2.2.2'
-gem 'test'
+  gemfile_with_ruby = <<-RUBY.strip_heredoc.strip
+    ruby '2.2.2'
+    gem 'test'
   RUBY
 
-  gemfile_with_sources = <<-RUBY.strip
-ruby '2.2.2'
+  gemfile_with_sources = <<-RUBY.strip_heredoc.strip
+    ruby '2.2.2'
 
-gem 'test'
+    gem 'test'
 
-source 'http://example.org' do
-  gem 'foobar'
-end
+    source 'http://example.org' do
+      gem 'foobar'
+    end
   RUBY
 
   describe '#gems' do
@@ -93,17 +93,35 @@ end
         before { subject.add_gem 'tweezer', '~> 1.0.0' }
 
         it 'adds the gem to the right place' do
-          expect(subject.dump).to eq <<-RUBY.strip
-ruby '2.2.2'
+          expect(subject.dump).to eq <<-RUBY.strip_heredoc.strip
+            ruby '2.2.2'
 
-gem 'test'
-gem 'tweezer', '~> 1.0.0'
+            gem 'test'
+            gem 'tweezer', '~> 1.0.0'
 
-source 'http://example.org' do
-  gem 'foobar'
-end
+            source 'http://example.org' do
+              gem 'foobar'
+            end
           RUBY
         end
+      end
+    end
+
+    context 'for a gemfile with source blocks' do
+      subject { described_class.new(gemfile_with_sources) }
+      before { subject.add_gem 'tweezer', '~> 1.0.0' }
+
+      it 'adds the gem to the right place' do
+        expect(subject.dump).to eq <<-RUBY.strip_heredoc.strip
+            ruby '2.2.2'
+
+            gem 'test'
+            gem 'tweezer', '~> 1.0.0'
+
+            source 'http://example.org' do
+              gem 'foobar'
+            end
+        RUBY
       end
     end
   end
