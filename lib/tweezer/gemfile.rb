@@ -29,7 +29,7 @@ module Tweezer
       gem = Gem.new(*args)
       fail GemAlreadyPresent if gems.include? gem
       gems << gem
-      @ast = @ast.append(gem.to_node)
+      append_before_first_source! gem.to_node
     end
 
     def dump
@@ -39,5 +39,24 @@ module Tweezer
     private
 
     attr_reader :ast, :comments
+
+    def append_before_first_source!(new_node)
+      nodes = ast.children.flat_map do |node|
+        source_block?(node) ? [new_node, blank_line, node] : [node]
+      end
+      nodes << new_node unless nodes.include? new_node
+
+      @ast = @ast.updated(nil, nodes)
+    end
+
+    def source_block?(node)
+      node.type == :block &&
+        node.children[0].type == :send &&
+        node.children[0].children[1] == :source
+    end
+
+    def blank_line
+      Parser::AST::Node.new(:blank_line)
+    end
   end
 end
