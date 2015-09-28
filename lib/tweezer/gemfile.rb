@@ -54,9 +54,6 @@ module Tweezer
 
     attr_reader :ast, :comments
 
-    def load_from_ast!
-    end
-
     def load_nodes!(nodes)
       nodes.each { |node| load_node! node }
     end
@@ -86,10 +83,6 @@ module Tweezer
       end
 
       @ast = @ast.updated(nil, nodes)
-    end
-
-    def blank_line
-      Parser::AST::Node.new(:blank_line)
     end
   end
 end

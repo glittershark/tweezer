@@ -4,6 +4,10 @@ module Tweezer
       Parser::AST::Node.new(type, children)
     end
 
+    def blank_line
+      Parser::AST::Node.new(:blank_line)
+    end
+
     def block?(node)
       node.type == :block
     end
