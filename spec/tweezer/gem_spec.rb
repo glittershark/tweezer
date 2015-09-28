@@ -16,6 +16,20 @@ describe Tweezer::Gem do
         its(:name) { is_expected.to eq 'test' }
         its(:version) { is_expected.to eq '~> 1.0.0' }
       end
+
+      context 'with a group' do
+        let(:node) { Parser::CurrentRuby.parse('gem "test", group: :test') }
+        subject { described_class.new(node) }
+        its(:name) { is_expected.to eq 'test' }
+        its(:groups) { is_expected.to eq [:test] }
+      end
+
+      context 'with an array of groups' do
+        let(:node) { Parser::CurrentRuby.parse('gem "test", group: [:a, :b]') }
+        subject { described_class.new(node) }
+        its(:name) { is_expected.to eq 'test' }
+        its(:groups) { is_expected.to eq [:a, :b] }
+      end
     end
 
     context 'with a name' do

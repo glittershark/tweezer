@@ -1,6 +1,8 @@
 require 'spec_helper'
 
 describe Tweezer::ASTHelper do
+  include described_class
+
   describe '.block?' do
     context 'for a block node' do
       subject { Parser::CurrentRuby.parse '2.times { puts "hello ruby" }' }
@@ -69,6 +71,12 @@ describe Tweezer::ASTHelper do
     let(:node) { Parser::CurrentRuby.parse "group(:test) { gem 'test' }" }
     subject { described_class.groups_from_group_block node }
     it { is_expected.to eq [:test] }
+  end
+
+  describe '.unparse_hash_node' do
+    let(:node) { Parser::CurrentRuby.parse '{ a: :b, "c" => :d }' }
+    subject { described_class.unparse_hash_node(node) }
+    it { is_expected.to eq a: s(:sym, :b), 'c' => s(:sym, :d) }
   end
 
   describe '.append_block_child' do

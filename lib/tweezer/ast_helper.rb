@@ -31,6 +31,13 @@ module Tweezer
       node.children[0].children[2..-1].flat_map(&:children)
     end
 
+    def unparse_hash_node(node)
+      fail ArgumentError unless node.type == :hash
+      node.children.map do |child|
+        [child.children[0].children[0], child.children[1]]
+      end.to_h
+    end
+
     def append_block_child(block, node)
       new_children = block.children[0..1]
       old_child = block.children[2]
@@ -45,6 +52,7 @@ module Tweezer
     end
 
     module_function :s, :block?, :source_block?, :group_block?, :block_children,
-                    :groups_from_group_block, :append_block_child
+                    :groups_from_group_block, :unparse_hash_node,
+                    :append_block_child
   end
 end

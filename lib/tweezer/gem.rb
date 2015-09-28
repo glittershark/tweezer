@@ -44,14 +44,19 @@ module Tweezer
 
     private
 
+    # rubocop:disable Metrics/AbcSize
     def init_from_node(node)
       check_node!(node)
-
       arguments = node.children[2..-1]
+      opts = arguments.pop if arguments[-1].type == :hash
 
       @name = arguments[0].children[0]
       @version = arguments[1].children[0] if arguments[1]
+
+      return unless opts
+      @groups = groups_from_node(unparse_hash_node(opts)[:group])
     end
+    # rubocop:enable Metrics/AbcSize
 
     def groups_to_node
       s(:pair,
@@ -61,6 +66,14 @@ module Tweezer
         else
           s(:array, groups.map { |g| s(:sym, g) })
         end)
+    end
+
+    def groups_from_node(node)
+      case node.type
+      when :sym then [node.children[0]]
+      when :array then node.children.flat_map(&:children)
+      else fail ArgumentError
+      end
     end
 
     def check_node!(node)
