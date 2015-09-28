@@ -34,6 +34,16 @@ describe Tweezer::Gemfile do
     end
   RUBY
 
+  gemfile_with_group = <<-RUBY.strip_heredoc.strip
+    ruby '2.2.2'
+
+    gem 'test'
+
+    group :development do
+      gem 'foobar'
+    end
+  RUBY
+
   describe '#gems' do
     context 'for a basic gemfile' do
       subject { described_class.new(basic_gemfile).gems }
@@ -53,56 +63,73 @@ describe Tweezer::Gemfile do
   end
 
   describe '#add_gem' do
-    context 'for a basic gemfile' do
-      subject { described_class.new(basic_gemfile) }
+    context 'with a basic gem' do
+      context 'for a basic gemfile' do
+        subject { described_class.new(basic_gemfile) }
 
-      context 'with just a name' do
-        before { subject.add_gem 'tweezer' }
+        context 'with just a name' do
+          before { subject.add_gem 'tweezer' }
 
-        it 'adds the gem to the #gems array' do
-          expect(subject.gems.last.name).to eq 'tweezer'
+          it 'adds the gem to the #gems array' do
+            expect(subject.gems.last.name).to eq 'tweezer'
+          end
+
+          it "adds the gem's node to the AST" do
+            expect(subject.dump).to include "gem 'tweezer'"
+          end
         end
 
-        it "adds the gem's node to the AST" do
-          expect(subject.dump).to include "gem 'tweezer'"
+        context 'with a name and a version' do
+          before { subject.add_gem 'tweezer', '~> 1.0.0' }
+
+          it 'adds the gem with the version to the #gems array' do
+            expect(subject.gems.last).to have_attributes name: 'tweezer',
+                                                         version: '~> 1.0.0'
+          end
+
+          it "adds the gem's node to the AST" do
+            expect(subject.dump).to include "gem 'tweezer', '~> 1.0.0'"
+          end
+        end
+
+        context "with a gem that's already present" do
+          it 'raises a GemAlreadyPresent error' do
+            expect { subject.add_gem('test1') }.to raise_error(
+              Tweezer::GemAlreadyPresent)
+          end
+        end
+
+        context 'for a gemfile with source blocks' do
+          subject { described_class.new(gemfile_with_sources) }
+          before { subject.add_gem 'tweezer', '~> 1.0.0' }
+
+          it 'adds the gem to the right place' do
+            expect(subject.dump).to eq <<-RUBY.strip_heredoc.strip
+              ruby '2.2.2'
+
+              gem 'test'
+              gem 'tweezer', '~> 1.0.0'
+
+              source 'http://example.org' do
+                gem 'foobar'
+              end
+            RUBY
+          end
         end
       end
 
-      context 'with a name and a version' do
-        before { subject.add_gem 'tweezer', '~> 1.0.0' }
+      context 'with a groups option' do
+        context 'to a basic gemfile' do
+          subject { described_class.new(basic_gemfile) }
+          before { subject.add_gem 'tweezer', '~> 1.0.0', groups: [:test] }
 
-        it 'adds the gem with the version to the #gems array' do
-          expect(subject.gems.last).to have_attributes name: 'tweezer',
-                                                       version: '~> 1.0.0'
-        end
-
-        it "adds the gem's node to the AST" do
-          expect(subject.dump).to include "gem 'tweezer', '~> 1.0.0'"
-        end
-      end
-
-      context "with a gem that's already present" do
-        it 'raises a GemAlreadyPresent error' do
-          expect { subject.add_gem('test1') }.to raise_error(
-            Tweezer::GemAlreadyPresent)
-        end
-      end
-
-      context 'for a gemfile with source blocks' do
-        subject { described_class.new(gemfile_with_sources) }
-        before { subject.add_gem 'tweezer', '~> 1.0.0' }
-
-        it 'adds the gem to the right place' do
-          expect(subject.dump).to eq <<-RUBY.strip_heredoc.strip
-            ruby '2.2.2'
-
-            gem 'test'
-            gem 'tweezer', '~> 1.0.0'
-
-            source 'http://example.org' do
-              gem 'foobar'
-            end
-          RUBY
+          it 'adds the gem with the group description' do
+            expect(subject.dump).to eq <<-RUBY.strip_heredoc.strip
+              gem 'test1'
+              gem 'test2', '~> 1.0'
+              gem 'tweezer', '~> 1.0.0', group: :test
+            RUBY
+          end
         end
       end
     end
@@ -119,6 +146,24 @@ describe Tweezer::Gemfile do
             gem 'tweezer', '~> 1.0.0'
 
             source 'http://example.org' do
+              gem 'foobar'
+            end
+        RUBY
+      end
+    end
+
+    context 'for a gemfile with groups' do
+      subject { described_class.new(gemfile_with_group) }
+      before { subject.add_gem 'tweezer', '~> 1.0.0' }
+
+      it 'adds the gem to the right place' do
+        expect(subject.dump).to eq <<-RUBY.strip_heredoc.strip
+            ruby '2.2.2'
+
+            gem 'test'
+            gem 'tweezer', '~> 1.0.0'
+
+            group :development do
               gem 'foobar'
             end
         RUBY

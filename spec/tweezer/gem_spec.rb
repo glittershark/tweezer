@@ -28,6 +28,13 @@ describe Tweezer::Gem do
       its(:name) { is_expected.to eq 'tweezer' }
       its(:version) { is_expected.to eq '~> 1.0.0' }
     end
+
+    context 'with a group' do
+      subject { described_class.new('tweezer', '~> 1.0.0', groups: [:test]) }
+      its(:name) { is_expected.to eq 'tweezer' }
+      its(:version) { is_expected.to eq '~> 1.0.0' }
+      its(:groups) { is_expected.to eq [:test] }
+    end
   end
 
   describe '#to_node' do
@@ -58,6 +65,29 @@ describe Tweezer::Gem do
 
       it "calls the gem method with the gem's version as the second argument" do
         expect(subject.children[3].children[0]).to eq '~> 1.0.0'
+      end
+    end
+
+    context 'with a group' do
+      let(:gem) { described_class.new('tweezer', '~> 1.0.0', groups: [:test]) }
+      subject { gem.to_node }
+
+      it 'calls the `gem` method' do
+        expect(subject.children[1]).to eq :gem
+      end
+
+      it 'calls the gem method with the name of the gem' do
+        expect(subject.children[2].children[0]).to eq 'tweezer'
+      end
+
+      it "calls the gem method with the gem's version as the second argument" do
+        expect(subject.children[3].children[0]).to eq '~> 1.0.0'
+      end
+
+      it 'calls the gem method with the groups as options' do
+        pair = subject.children[4].children[0]
+        expect(pair.children[0].children[0]).to eq :group
+        expect(pair.children[1].children[0]).to eq :test
       end
     end
   end

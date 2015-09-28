@@ -1,6 +1,6 @@
 module Tweezer
   class Gem
-    def initialize(node_or_name, version = nil)
+    def initialize(node_or_name, version = nil, opts = {})
       if node_or_name.is_a? Parser::AST::Node
         check_node!(node_or_name)
 
@@ -11,12 +11,14 @@ module Tweezer
       else
         @name = node_or_name
         @version = version
+        @groups = opts[:groups]
       end
     end
 
     def to_node
-      args = [nil, :gem, Parser::AST::Node.new(:str, [name])]
-      args << Parser::AST::Node.new(:str, [version]) if version
+      args = [nil, :gem, s(:str, name)]
+      args << s(:str, version) if version
+      args << s(:hash, groups_to_node) unless groups.empty?
 
       Parser::AST::Node.new(:send, args)
     end
@@ -32,7 +34,25 @@ module Tweezer
 
     attr_reader :name, :version
 
+    def groups
+      @groups ||= []
+    end
+
     private
+
+    def groups_to_node
+      s(:pair,
+        s(:sym, :group),
+        if groups.length == 1
+          s(:sym, groups[0])
+        else
+          s(:array, groups.map { |g| s(:sym, g) })
+        end)
+    end
+
+    def s(type, *children)
+      Parser::AST::Node.new(type, children)
+    end
 
     def check_node!(node)
       return if self.class.gem_node?(node)
