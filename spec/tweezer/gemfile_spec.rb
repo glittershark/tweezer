@@ -195,7 +195,9 @@ describe Tweezer::Gemfile do
       'basic gemfile' => basic_gemfile,
       'gemfile with comments' => gemfile_with_comments,
       'gemfile with newlines' => gemfile_with_newline,
-      'gemfile with a ruby version' => gemfile_with_ruby
+      'gemfile with a ruby version' => gemfile_with_ruby,
+      'gemfile with a source block' => gemfile_with_sources,
+      'gemfile with a group block' => gemfile_with_group
     }.each do |name, source|
       context "for a #{name}" do
         subject { described_class.new(source).dump }
