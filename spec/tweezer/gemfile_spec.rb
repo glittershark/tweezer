@@ -38,6 +38,7 @@ describe Tweezer::Gemfile do
     ruby '2.2.2'
 
     gem 'test'
+    gem 'test2', group: :test
 
     group :development do
       gem 'foobar'
@@ -162,6 +163,7 @@ describe Tweezer::Gemfile do
             ruby '2.2.2'
 
             gem 'test'
+            gem 'test2', group: :test
             gem 'tweezer', '~> 1.0.0'
 
             group :development do
@@ -172,19 +174,43 @@ describe Tweezer::Gemfile do
       end
 
       context 'with a :groups option' do
-        before { subject.add_gem 'tweezer', groups: [:development] }
+        context 'when that group matches an existing block' do
+          before { subject.add_gem 'tweezer', groups: [:development] }
 
-        it 'adds the gem to the existing group block' do
-          expect(subject.dump).to eq <<-RUBY.strip_heredoc.strip
-            ruby '2.2.2'
+          it 'adds the gem to the existing group block' do
+            expect(subject.dump).to eq <<-RUBY.strip_heredoc.strip
+              ruby '2.2.2'
 
-            gem 'test'
+              gem 'test'
+              gem 'test2', group: :test
 
-            group :development do
-              gem 'foobar'
-              gem 'tweezer'
-            end
-          RUBY
+              group :development do
+                gem 'foobar'
+                gem 'tweezer'
+              end
+            RUBY
+          end
+        end
+
+        context 'when that group matches an existing gem' do
+          before { subject.add_gem 'tweezer', groups: [:test] }
+
+          it 'adds the gem, and the existing gem, to a new group block' do
+            expect(subject.dump).to eq <<-RUBY.strip_heredoc.strip
+              ruby '2.2.2'
+
+              gem 'test'
+
+              group :test do
+                gem 'test2'
+                gem 'tweezer'
+              end
+
+              group :development do
+                gem 'foobar'
+              end
+            RUBY
+          end
         end
       end
     end

@@ -26,24 +26,33 @@ module Tweezer
       @gems ||= []
     end
 
-    def group_blocks
-      @group_blocks ||= []
+    # Maps arrays of groups to arrays of Gems
+    def groups
+      @groups ||= Hash.new { |h, k| h[k] = [] }
     end
 
     # rubocop:disable Metrics/AbcSize
+    # rubocop:disable Metrics/MethodLength
     def add_gem(*args)
       gem = Gem.new(*args)
       fail GemAlreadyPresent if gems.include? gem
       gems << gem
 
-      if group_blocks.include?(gem.groups)
-        groups = gem.groups
+      if groups.include?(gem.groups)
+        gem_groups = gem.groups
         gem.groups = []
-        append_to_group_block! gem.to_node, groups: groups
+
+        if groups[gem_groups].size == 1
+          gem_to_group_block!(groups[gem_groups].first)
+        end
+
+        append_to_group_block! gem.to_node, groups: gem_groups
       else
+        groups[gem.groups] = [gem] unless gem.groups.empty?
         append_before_first_block! gem.to_node
       end
     end
+    # rubocop:enable Metrics/MethodLength
     # rubocop:enable Metrics/AbcSize
 
     def dump
@@ -55,13 +64,24 @@ module Tweezer
     attr_reader :ast, :comments
 
     def load_nodes!(nodes)
-      nodes.each { |node| load_node! node }
+      nodes.map { |node| load_node! node }.compact
     end
 
     def load_node!(node)
-      gems << Gem.new(node) if Gem.gem_node? node
-      group_blocks << groups_from_group_block(node) if group_block?(node)
-      load_nodes! block_children(node) if block?(node)
+      return load_block_node!(node) if block? node
+      return unless Gem.gem_node?(node)
+
+      gem = Gem.new(node)
+      gems << gem
+      groups[gem.groups] << gem unless gem.groups.empty?
+      gem
+    end
+
+    def load_block_node!(node)
+      fail ArgumentError unless block?(node)
+      gems = load_nodes!(block_children(node))
+      groups[groups_from_group_block(node)].concat(gems) if group_block?(node)
+      nil
     end
 
     def append_before_first_block!(new_node)
@@ -83,6 +103,27 @@ module Tweezer
       end
 
       @ast = @ast.updated(nil, nodes)
+    end
+
+    def gem_to_group_block!(gem)
+      nodes = ast.children.flat_map do |node|
+        next [node] unless node == gem.to_node
+
+        gem_groups = gem.groups
+        gem.groups = []
+
+        [blank_line, group_block(gem_groups, gem), blank_line]
+      end
+
+      @ast = @ast.updated(nil, nodes)
+    end
+
+    def group_block(groups, *gems)
+      s(:block,
+        s(:send, nil, :group,
+          *(groups.map { |group| s(:sym, group) })),
+        s(:args),
+        *gems.map(&:to_node))
     end
   end
 end
