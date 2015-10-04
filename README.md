@@ -20,11 +20,11 @@ gem install tweezer
 tweezer add rake # Adds rake to the end of the default group in your Gemfile
 
 tweezer add rake '~> 0.9.6' # Adds rake ~> 0.9.6 to the end of the default group
-                              in your Gemfile
+                            # in your Gemfile
 
 tweezer add rspec --group test # Adds rspec to the 'test' group in your gemfile.
-                                 Tweezer will do this in a way that results in
-                                 the most idiomatic possible Gemfile
+                               # Tweezer will do this in a way that results in
+                               # the most idiomatic possible Gemfile
 ```
 
 For further documentation, run `tweezer help` and `tweezer help COMMAND`.
