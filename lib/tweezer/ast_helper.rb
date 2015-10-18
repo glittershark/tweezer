@@ -37,9 +37,9 @@ module Tweezer
 
     def unparse_hash_node(node)
       fail ArgumentError unless node.type == :hash
-      node.children.map do |child|
+      Hash[node.children.map do |child|
         [child.children[0].children[0], child.children[1]]
-      end.to_h
+      end]
     end
 
     def append_block_child(block, node)
