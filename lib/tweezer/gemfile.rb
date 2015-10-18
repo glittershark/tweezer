@@ -56,7 +56,9 @@ module Tweezer
     # rubocop:enable Metrics/AbcSize
 
     def dump
-      Unparser.unparse(ast, comments)
+      dumped = Unparser.unparse(ast, comments).dup
+      dumped << "\n" unless dumped.last == "\n"
+      dumped
     end
 
     private
@@ -85,8 +87,14 @@ module Tweezer
     end
 
     def append_before_first_block!(new_node)
+      appended = false
       nodes = ast.children.flat_map do |node|
-        block?(node) ? [new_node, blank_line, node] : [node]
+        if block?(node) && !appended
+          appended = true
+          next [new_node, blank_line, node, blank_line]
+        end
+
+        [node]
       end
       nodes << new_node unless nodes.include? new_node
 

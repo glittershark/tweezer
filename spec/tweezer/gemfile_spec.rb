@@ -1,30 +1,30 @@
 require 'spec_helper'
 
 describe Tweezer::Gemfile do
-  basic_gemfile = <<-RUBY.strip_heredoc.strip
+  basic_gemfile = <<-RUBY.strip_heredoc
     gem 'test1'
     gem 'test2', '~> 1.0'
   RUBY
 
-  gemfile_with_comments = <<-RUBY.strip_heredoc.strip
+  gemfile_with_comments = <<-RUBY.strip_heredoc
     # the 'test1' gem
     gem 'test1'
     # the 'test2' gem
     gem 'test2', '~> 1.0'
   RUBY
 
-  gemfile_with_newline = <<-RUBY.strip_heredoc.strip
+  gemfile_with_newline = <<-RUBY.strip_heredoc
     gem 'test1'
 
     gem 'test2', '~> 1.0'
   RUBY
 
-  gemfile_with_ruby = <<-RUBY.strip_heredoc.strip
+  gemfile_with_ruby = <<-RUBY.strip_heredoc
     ruby '2.2.2'
     gem 'test'
   RUBY
 
-  gemfile_with_sources = <<-RUBY.strip_heredoc.strip
+  gemfile_with_sources = <<-RUBY.strip_heredoc
     ruby '2.2.2'
 
     gem 'test'
@@ -34,7 +34,7 @@ describe Tweezer::Gemfile do
     end
   RUBY
 
-  gemfile_with_group = <<-RUBY.strip_heredoc.strip
+  gemfile_with_group = <<-RUBY.strip_heredoc
     ruby '2.2.2'
 
     gem 'test'
@@ -42,6 +42,21 @@ describe Tweezer::Gemfile do
 
     group :development do
       gem 'foobar'
+    end
+  RUBY
+
+  gemfile_with_multiple_groups = <<-RUBY.strip_heredoc
+    ruby '2.2.2'
+
+    gem 'test'
+    gem 'test2', group: :test
+
+    group :development do
+      gem 'foobar'
+    end
+
+    group :test do
+      gem 'boofar'
     end
   RUBY
 
@@ -105,7 +120,7 @@ describe Tweezer::Gemfile do
           before { subject.add_gem 'tweezer', '~> 1.0.0' }
 
           it 'adds the gem to the right place' do
-            expect(subject.dump).to eq <<-RUBY.strip_heredoc.strip
+            expect(subject.dump).to eq <<-RUBY.strip_heredoc
               ruby '2.2.2'
 
               gem 'test'
@@ -113,6 +128,29 @@ describe Tweezer::Gemfile do
 
               source 'http://example.org' do
                 gem 'foobar'
+              end
+            RUBY
+          end
+        end
+
+        context 'for a gemfile with group blocks' do
+          subject { described_class.new(gemfile_with_multiple_groups) }
+          before { subject.add_gem 'tweezer', '~> 1.0.0' }
+
+          it 'adds the gem to the right place' do
+            expect(subject.dump).to eq <<-RUBY.strip_heredoc
+              ruby '2.2.2'
+
+              gem 'test'
+              gem 'test2', group: :test
+              gem 'tweezer', '~> 1.0.0'
+
+              group :development do
+                gem 'foobar'
+              end
+
+              group :test do
+                gem 'boofar'
               end
             RUBY
           end
@@ -125,7 +163,7 @@ describe Tweezer::Gemfile do
           before { subject.add_gem 'tweezer', '~> 1.0.0', groups: [:test] }
 
           it 'adds the gem with the group description' do
-            expect(subject.dump).to eq <<-RUBY.strip_heredoc.strip
+            expect(subject.dump).to eq <<-RUBY.strip_heredoc
               gem 'test1'
               gem 'test2', '~> 1.0'
               gem 'tweezer', '~> 1.0.0', group: :test
@@ -140,7 +178,7 @@ describe Tweezer::Gemfile do
       before { subject.add_gem 'tweezer', '~> 1.0.0' }
 
       it 'adds the gem to the right place' do
-        expect(subject.dump).to eq <<-RUBY.strip_heredoc.strip
+        expect(subject.dump).to eq <<-RUBY.strip_heredoc
           ruby '2.2.2'
 
           gem 'test'
@@ -159,7 +197,7 @@ describe Tweezer::Gemfile do
         before { subject.add_gem 'tweezer', '~> 1.0.0' }
 
         it 'adds the gem to the right place' do
-          expect(subject.dump).to eq <<-RUBY.strip_heredoc.strip
+          expect(subject.dump).to eq <<-RUBY.strip_heredoc
             ruby '2.2.2'
 
             gem 'test'
@@ -178,7 +216,7 @@ describe Tweezer::Gemfile do
           before { subject.add_gem 'tweezer', groups: [:development] }
 
           it 'adds the gem to the existing group block' do
-            expect(subject.dump).to eq <<-RUBY.strip_heredoc.strip
+            expect(subject.dump).to eq <<-RUBY.strip_heredoc
               ruby '2.2.2'
 
               gem 'test'
@@ -196,7 +234,7 @@ describe Tweezer::Gemfile do
           before { subject.add_gem 'tweezer', groups: [:test] }
 
           it 'adds the gem, and the existing gem, to a new group block' do
-            expect(subject.dump).to eq <<-RUBY.strip_heredoc.strip
+            expect(subject.dump).to eq <<-RUBY.strip_heredoc
               ruby '2.2.2'
 
               gem 'test'
@@ -223,7 +261,8 @@ describe Tweezer::Gemfile do
       'gemfile with newlines' => gemfile_with_newline,
       'gemfile with a ruby version' => gemfile_with_ruby,
       'gemfile with a source block' => gemfile_with_sources,
-      'gemfile with a group block' => gemfile_with_group
+      'gemfile with a group block' => gemfile_with_group,
+      'gemfile with multiple group blocks' => gemfile_with_multiple_groups
     }.each do |name, source|
       context "for a #{name}" do
         subject { described_class.new(source).dump }
