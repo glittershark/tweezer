@@ -3,4 +3,11 @@ require 'tweezer'
 
 require 'rspec/collection_matchers'
 require 'rspec/its'
-require 'active_support/all'
+
+# from ActiveSupport
+class String
+  def strip_heredoc
+    indent = scan(/^[ \t]*(?=\S)/).min.size || 0
+    gsub(/^[ \t]{#{indent}}/, '')
+  end
+end

@@ -57,7 +57,7 @@ module Tweezer
 
     def dump
       dumped = Unparser.unparse(ast, comments).dup
-      dumped << "\n" unless dumped.last == "\n"
+      dumped << "\n" unless dumped[-1] == "\n"
       dumped
     end
 
