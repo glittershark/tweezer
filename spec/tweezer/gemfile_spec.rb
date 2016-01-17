@@ -96,7 +96,7 @@ describe Tweezer::Gemfile do
         end
 
         context 'with a name and a version' do
-          before { subject.add_gem 'tweezer', '~> 1.0.0' }
+          before { subject.add_gem 'tweezer', version: '~> 1.0.0' }
 
           it 'adds the gem with the version to the #gems array' do
             expect(subject.gems.last).to have_attributes name: 'tweezer',
@@ -105,6 +105,20 @@ describe Tweezer::Gemfile do
 
           it "adds the gem's node to the AST" do
             expect(subject.dump).to include "gem 'tweezer', '~> 1.0.0'"
+          end
+        end
+
+        context 'with a name and a path' do
+          before { subject.add_gem 'tweezer', path: '~/code/tweezer' }
+
+          it 'adds the gem with the path to the #gems array' do
+            expect(subject.gems.last).to have_attributes name: 'tweezer',
+                                                         path: '~/code/tweezer'
+          end
+
+          it "adds the gem's node to the AST" do
+            expect(subject.dump).to include(
+              "gem 'tweezer', path: '~/code/tweezer'")
           end
         end
 
@@ -117,7 +131,7 @@ describe Tweezer::Gemfile do
 
         context 'for a gemfile with source blocks' do
           subject { described_class.new(gemfile_with_sources) }
-          before { subject.add_gem 'tweezer', '~> 1.0.0' }
+          before { subject.add_gem 'tweezer', version: '~> 1.0.0' }
 
           it 'adds the gem to the right place' do
             expect(subject.dump).to eq <<-RUBY.strip_heredoc
@@ -135,7 +149,7 @@ describe Tweezer::Gemfile do
 
         context 'for a gemfile with group blocks' do
           subject { described_class.new(gemfile_with_multiple_groups) }
-          before { subject.add_gem 'tweezer', '~> 1.0.0' }
+          before { subject.add_gem 'tweezer', version: '~> 1.0.0' }
 
           it 'adds the gem to the right place' do
             expect(subject.dump).to eq <<-RUBY.strip_heredoc
@@ -160,7 +174,9 @@ describe Tweezer::Gemfile do
       context 'with a groups option' do
         context 'to a basic gemfile' do
           subject { described_class.new(basic_gemfile) }
-          before { subject.add_gem 'tweezer', '~> 1.0.0', groups: [:test] }
+          before do
+            subject.add_gem 'tweezer', version: '~> 1.0.0', groups: [:test]
+          end
 
           it 'adds the gem with the group description' do
             expect(subject.dump).to eq <<-RUBY.strip_heredoc
@@ -175,7 +191,7 @@ describe Tweezer::Gemfile do
 
     context 'for a gemfile with source blocks' do
       subject { described_class.new(gemfile_with_sources) }
-      before { subject.add_gem 'tweezer', '~> 1.0.0' }
+      before { subject.add_gem 'tweezer', version: '~> 1.0.0' }
 
       it 'adds the gem to the right place' do
         expect(subject.dump).to eq <<-RUBY.strip_heredoc
@@ -194,7 +210,7 @@ describe Tweezer::Gemfile do
     context 'for a gemfile with groups' do
       subject { described_class.new(gemfile_with_group) }
       context 'for a basic gem' do
-        before { subject.add_gem 'tweezer', '~> 1.0.0' }
+        before { subject.add_gem 'tweezer', version: '~> 1.0.0' }
 
         it 'adds the gem to the right place' do
           expect(subject.dump).to eq <<-RUBY.strip_heredoc
@@ -247,6 +263,45 @@ describe Tweezer::Gemfile do
               group :development do
                 gem 'foobar'
               end
+            RUBY
+          end
+        end
+      end
+    end
+  end
+
+  describe '#alter_gem' do
+    context "when the gem isn't present in the gemfile" do
+      subject { described_class.new(basic_gemfile) }
+
+      it 'raises an error' do
+        expect { subject.alter_gem 'tweezer' }.to raise_error(
+          Tweezer::GemNotPresent)
+      end
+    end
+
+    context 'with a basic gem' do
+      context 'for a basic gemfile' do
+        subject { described_class.new(basic_gemfile) }
+
+        context 'changing the version' do
+          before { subject.alter_gem 'test1', version: '~> 1.1' }
+
+          it "adds the gem's version to the gemfile source" do
+            expect(subject.dump).to eq <<-RUBY.strip_heredoc
+              gem 'test1', '~> 1.1'
+              gem 'test2', '~> 1.0'
+            RUBY
+          end
+        end
+
+        context 'changing the path' do
+          before { subject.alter_gem 'test1', path: '~/code/test1' }
+
+          it "adds the gem's version to the gemfile source" do
+            expect(subject.dump).to eq <<-RUBY.strip_heredoc
+              gem 'test1', path: '~/code/test1'
+              gem 'test2', '~> 1.0'
             RUBY
           end
         end

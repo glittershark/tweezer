@@ -55,6 +55,13 @@ module Tweezer
     # rubocop:enable Metrics/MethodLength
     # rubocop:enable Metrics/AbcSize
 
+    def alter_gem(name, **options)
+      gem = gems.find { |g| g.name == name } || fail(GemNotPresent)
+      old_node = gem.to_node
+      gem.alter!(options)
+      replace_gem!(old_node, gem.to_node)
+    end
+
     def dump
       dumped = Unparser.unparse(ast, comments).dup
       dumped << "\n" unless dumped[-1] == "\n"
@@ -110,6 +117,11 @@ module Tweezer
         end
       end
 
+      @ast = @ast.updated(nil, nodes)
+    end
+
+    def replace_gem!(old_node, new_node)
+      nodes = ast.children.map { |node| node == old_node ? new_node : node }
       @ast = @ast.updated(nil, nodes)
     end
 

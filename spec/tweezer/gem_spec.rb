@@ -17,6 +17,15 @@ describe Tweezer::Gem do
         its(:version) { is_expected.to eq '~> 1.0.0' }
       end
 
+      context 'with a path' do
+        let(:node) do
+          Parser::CurrentRuby.parse('gem "test", path: "~/code/tweezer"')
+        end
+        subject { described_class.new(node) }
+        its(:name) { is_expected.to eq 'test' }
+        its(:path) { is_expected.to eq '~/code/tweezer' }
+      end
+
       context 'with a group' do
         let(:node) { Parser::CurrentRuby.parse('gem "test", group: :test') }
         subject { described_class.new(node) }
@@ -38,17 +47,32 @@ describe Tweezer::Gem do
     end
 
     context 'with a name and a version' do
-      subject { described_class.new('tweezer', '~> 1.0.0') }
+      subject { described_class.new('tweezer', version: '~> 1.0.0') }
       its(:name) { is_expected.to eq 'tweezer' }
       its(:version) { is_expected.to eq '~> 1.0.0' }
     end
 
+    context 'with a name and a path' do
+      subject { described_class.new('tweezer', path: '~/code/tweezer') }
+      its(:name) { is_expected.to eq 'tweezer' }
+      its(:path) { is_expected.to eq '~/code/tweezer' }
+    end
+
     context 'with a group' do
-      subject { described_class.new('tweezer', '~> 1.0.0', groups: [:test]) }
+      subject do
+        described_class.new('tweezer', version: '~> 1.0.0', groups: [:test])
+      end
       its(:name) { is_expected.to eq 'tweezer' }
       its(:version) { is_expected.to eq '~> 1.0.0' }
       its(:groups) { is_expected.to eq [:test] }
     end
+  end
+
+  describe '#alter!' do
+    subject { described_class.new 'test' }
+    before { subject.alter! version: '~> 1.0.0', path: '~/code/test' }
+    its(:version) { is_expected.to eq '~> 1.0.0' }
+    its(:path) { is_expected.to eq '~/code/test' }
   end
 
   describe '#to_node' do
@@ -66,7 +90,7 @@ describe Tweezer::Gem do
     end
 
     context 'with a name and a version' do
-      subject { described_class.new('tweezer', '~> 1.0.0').to_node }
+      subject { described_class.new('tweezer', version: '~> 1.0.0').to_node }
       its(:type) { is_expected.to eq :send }
 
       it 'calls the `gem` method' do
@@ -82,8 +106,36 @@ describe Tweezer::Gem do
       end
     end
 
+    context 'with a name, version, and path' do
+      subject do
+        described_class.new('tweezer', path: '~/gems/tweezer',
+                                       version: '~> 1.0.0').to_node
+      end
+      its(:type) { is_expected.to eq :send }
+
+      it 'calls the `gem` method' do
+        expect(subject.children[1]).to eq :gem
+      end
+
+      it 'calls the gem method with the name of the gem' do
+        expect(subject.children[2].children[0]).to eq 'tweezer'
+      end
+
+      it "calls the gem method with the gem's version as the second argument" do
+        expect(subject.children[3].children[0]).to eq '~> 1.0.0'
+      end
+
+      it 'calls the gem method with the path as an option' do
+        pair = subject.children[4].children[0]
+        expect(pair.children[0].children[0]).to eq :path
+        expect(pair.children[1].children[0]).to eq '~/gems/tweezer'
+      end
+    end
+
     context 'with a group' do
-      let(:gem) { described_class.new('tweezer', '~> 1.0.0', groups: [:test]) }
+      let(:gem) do
+        described_class.new('tweezer', version: '~> 1.0.0', groups: [:test])
+      end
       subject { gem.to_node }
 
       it 'calls the `gem` method' do
@@ -107,18 +159,25 @@ describe Tweezer::Gem do
   end
 
   describe '#==' do
-    subject { described_class.new('tweezer', '~> 1.0.0') }
+    subject { described_class.new('tweezer', version: '~> 1.0.0') }
 
     context 'with two equal gems' do
-      it { is_expected.to eq described_class.new('tweezer', '~> 1.0.0') }
+      it do
+        is_expected.to eq described_class.new('tweezer', version: '~> 1.0.0')
+      end
     end
 
     context 'when the versions differ' do
-      it { is_expected.to_not eq described_class.new('tweezer', '~> 1.0.1') }
+      it do
+        is_expected.to_not eq described_class.new('tweezer',
+                                                  version: '~> 1.0.1')
+      end
     end
 
     context 'when the names differ' do
-      it { is_expected.to_not eq described_class.new('foobar', '~> 1.0.0') }
+      it do
+        is_expected.to_not eq described_class.new('foobar', version: '~> 1.0.0')
+      end
     end
   end
 
