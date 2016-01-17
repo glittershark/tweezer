@@ -29,7 +29,8 @@ module Tweezer
       node.children[1] == :gem
     end
 
-    attr_reader :name, :version
+    attr_reader :name
+    attr_accessor :version
     attr_writer :groups
 
     def groups

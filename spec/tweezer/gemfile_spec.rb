@@ -256,6 +256,34 @@ describe Tweezer::Gemfile do
     end
   end
 
+  describe '#alter_gem' do
+    context "when the gem isn't present in the gemfile" do
+      subject { described_class.new(basic_gemfile) }
+
+      it 'raises an error' do
+        expect { subject.alter_gem 'tweezer' }.to raise_error(
+          Tweezer::GemNotPresent)
+      end
+    end
+
+    context 'with a basic gem' do
+      context 'for a basic gemfile' do
+        subject { described_class.new(basic_gemfile) }
+
+        context 'changing the version' do
+          before { subject.alter_gem 'test1', version: '~> 1.1' }
+
+          it "adds the gem's version to the gemfile source" do
+            expect(subject.dump).to eq <<-RUBY.strip_heredoc
+              gem 'test1', '~> 1.1'
+              gem 'test2', '~> 1.0'
+            RUBY
+          end
+        end
+      end
+    end
+  end
+
   describe '#dump' do
     {
       'basic gemfile' => basic_gemfile,
