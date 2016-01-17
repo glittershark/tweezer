@@ -17,6 +17,15 @@ describe Tweezer::Gem do
         its(:version) { is_expected.to eq '~> 1.0.0' }
       end
 
+      context 'with a path' do
+        let(:node) do
+          Parser::CurrentRuby.parse('gem "test", path: "~/code/tweezer"')
+        end
+        subject { described_class.new(node) }
+        its(:name) { is_expected.to eq 'test' }
+        its(:path) { is_expected.to eq '~/code/tweezer' }
+      end
+
       context 'with a group' do
         let(:node) { Parser::CurrentRuby.parse('gem "test", group: :test') }
         subject { described_class.new(node) }
@@ -41,6 +50,12 @@ describe Tweezer::Gem do
       subject { described_class.new('tweezer', version: '~> 1.0.0') }
       its(:name) { is_expected.to eq 'tweezer' }
       its(:version) { is_expected.to eq '~> 1.0.0' }
+    end
+
+    context 'with a name and a path' do
+      subject { described_class.new('tweezer', path: '~/code/tweezer') }
+      its(:name) { is_expected.to eq 'tweezer' }
+      its(:path) { is_expected.to eq '~/code/tweezer' }
     end
 
     context 'with a group' do
@@ -81,6 +96,32 @@ describe Tweezer::Gem do
 
       it "calls the gem method with the gem's version as the second argument" do
         expect(subject.children[3].children[0]).to eq '~> 1.0.0'
+      end
+    end
+
+    context 'with a name, version, and path' do
+      subject do
+        described_class.new('tweezer', path: '~/gems/tweezer',
+                                       version: '~> 1.0.0').to_node
+      end
+      its(:type) { is_expected.to eq :send }
+
+      it 'calls the `gem` method' do
+        expect(subject.children[1]).to eq :gem
+      end
+
+      it 'calls the gem method with the name of the gem' do
+        expect(subject.children[2].children[0]).to eq 'tweezer'
+      end
+
+      it "calls the gem method with the gem's version as the second argument" do
+        expect(subject.children[3].children[0]).to eq '~> 1.0.0'
+      end
+
+      it 'calls the gem method with the path as an option' do
+        pair = subject.children[4].children[0]
+        expect(pair.children[0].children[0]).to eq :path
+        expect(pair.children[1].children[0]).to eq '~/gems/tweezer'
       end
     end
 

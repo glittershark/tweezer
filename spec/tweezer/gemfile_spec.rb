@@ -108,6 +108,20 @@ describe Tweezer::Gemfile do
           end
         end
 
+        context 'with a name and a path' do
+          before { subject.add_gem 'tweezer', path: '~/code/tweezer' }
+
+          it 'adds the gem with the path to the #gems array' do
+            expect(subject.gems.last).to have_attributes name: 'tweezer',
+                                                         path: '~/code/tweezer'
+          end
+
+          it "adds the gem's node to the AST" do
+            expect(subject.dump).to include(
+              "gem 'tweezer', path: '~/code/tweezer'")
+          end
+        end
+
         context "with a gem that's already present" do
           it 'raises a GemAlreadyPresent error' do
             expect { subject.add_gem('test1') }.to raise_error(

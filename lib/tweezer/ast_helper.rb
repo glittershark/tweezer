@@ -36,6 +36,7 @@ module Tweezer
     end
 
     def unparse_hash_node(node)
+      return {} unless node
       fail ArgumentError unless node.type == :hash
       Hash[node.children.map do |child|
         [child.children[0].children[0], child.children[1]]

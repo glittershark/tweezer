@@ -9,13 +9,15 @@ module Tweezer
       @name = node_or_name
       @version = opts[:version]
       @groups = opts[:groups]
+      @path = opts[:path]
       @opts = opts
     end
 
     def to_node
       args = [nil, :gem, s(:str, name)]
       args << s(:str, version) if version
-      args << s(:hash, groups_to_node) unless groups.empty?
+      opts_node = opts_to_node
+      args << opts_node if opts_node
 
       Parser::AST::Node.new(:send, args)
     end
@@ -30,7 +32,7 @@ module Tweezer
     end
 
     attr_reader :name
-    attr_accessor :version
+    attr_accessor :version, :path
     attr_writer :groups
 
     def groups
@@ -48,8 +50,9 @@ module Tweezer
       @name = arguments[0].children[0]
       @version = arguments[1].children[0] if arguments[1]
 
-      return unless opts
-      @groups = groups_from_node(unparse_hash_node(opts)[:group])
+      opts_h = unparse_hash_node(opts)
+      @groups = groups_from_node(opts_h[:group])
+      @path = path_from_node(opts_h[:path])
     end
     # rubocop:enable Metrics/AbcSize
 
@@ -63,12 +66,27 @@ module Tweezer
         end)
     end
 
+    def opts_to_node
+      pairs = []
+      pairs << groups_to_node unless groups.empty?
+      pairs << s(:pair, s(:sym, :path), s(:str, path)) if path
+      return if pairs.empty?
+      s(:hash, *pairs)
+    end
+
     def groups_from_node(node)
+      return [] unless node
       case node.type
       when :sym then [node.children[0]]
       when :array then node.children.flat_map(&:children)
       else fail ArgumentError
       end
+    end
+
+    def path_from_node(node)
+      return unless node
+      fail ArgumentError unless node.type == :str
+      node.children.first
     end
 
     def check_node!(node)
