@@ -13,15 +13,11 @@ module Tweezer
     end
 
     def source_block?(node)
-      block?(node) &&
-        node.children[0].type == :send &&
-        node.children[0].children[1] == :source
+      block_type(node) == :source
     end
 
     def group_block?(node)
-      block?(node) &&
-        node.children[0].type == :send &&
-        node.children[0].children[1] == :group
+      block_type(node) == :group
     end
 
     def block_children(node)
@@ -59,5 +55,17 @@ module Tweezer
     module_function :s, :block?, :source_block?, :group_block?, :block_children,
                     :groups_from_group_block, :unparse_hash_node,
                     :append_block_child
+
+    private
+
+    def block_with_send?(node)
+      block?(node) && node.children[0].type == :send
+    end
+
+    def block_type(node)
+      node.children[0].children[1] if block_with_send?(node)
+    end
+
+    module_function :block_with_send?, :block_type
   end
 end
