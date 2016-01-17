@@ -17,6 +17,8 @@ gem install tweezer
 
 ## Usage
 
+For full documentation, run `tweezer help` and `tweezer help COMMAND`.
+
 ### Adding new gems - `tweezer add`
 ```sh
 tweezer add rake # Adds rake to the end of the default group in your Gemfile
@@ -37,8 +39,6 @@ tweezer alter rake -v '~> 10.4.2' # Changes rake in the gemfile to be pinned to
 tweezer alter rake -p '~/code/rake' # Changes rake in the gemfile to be
                                     # installed from `~/code/rake`
 ```
-
-For further documentation, run `tweezer help` and `tweezer help COMMAND`.
 
 ## Why?
 
