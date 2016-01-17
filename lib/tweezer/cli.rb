@@ -18,10 +18,29 @@ module Tweezer
          'add GEM to the gemfile, optionally pinned to VERSION'
     option :groups, type: :array, aliases: '-g',
                     desc: 'Groups to add the gem to'
-    def add(name, version = nil)
-      groups = options[:groups].map(&:to_sym) if options[:groups]
-      @gemfile.add_gem(name, version, groups: groups || [])
+    def add(name)
+      @gemfile.add_gem(name, **gem_opts)
       @gemfile.save!
+    end
+
+    desc 'alter GEM',
+         'alter GEM that is already in the gemfile, with the given options'
+    option :version, aliases: '-v', desc: 'version to pin the gem to'
+    option :groups, aliases: '-g',
+                    type: :array,
+                    desc: 'version to pin the gem to'
+    def alter(name)
+      @gemfile.alter_gem(name, **gem_opts)
+      @gemfile.save!
+    end
+
+    private
+
+    def gem_opts
+      @gem_opts ||= {
+        groups: options[:groups] ? options[:groups].map(&:to_sym) : [],
+        version: options[:version] || ''
+      }
     end
   end
 end
