@@ -1,4 +1,4 @@
-# Tweezer [![Build Status](https://travis-ci.org/glittershark/tweezer.svg?branch=master)](https://travis-ci.org/glittershark/tweezer)
+# Tweezer [![Build Status](https://travis-ci.org/glittershark/tweezer.svg?branch=master)](https://travis-ci.org/glittershark/tweezer) [![Test Coverage](https://codeclimate.com/github/glittershark/tweezer/badges/coverage.svg)](https://codeclimate.com/github/glittershark/tweezer/coverage)
 
 **Tweezer** is a CLI tool for editing your Gemfile that goes to great extents to
 ensure the Gemfile remains both valid and idiomatic
