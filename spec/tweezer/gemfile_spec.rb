@@ -96,7 +96,7 @@ describe Tweezer::Gemfile do
         end
 
         context 'with a name and a version' do
-          before { subject.add_gem 'tweezer', '~> 1.0.0' }
+          before { subject.add_gem 'tweezer', version: '~> 1.0.0' }
 
           it 'adds the gem with the version to the #gems array' do
             expect(subject.gems.last).to have_attributes name: 'tweezer',
@@ -117,7 +117,7 @@ describe Tweezer::Gemfile do
 
         context 'for a gemfile with source blocks' do
           subject { described_class.new(gemfile_with_sources) }
-          before { subject.add_gem 'tweezer', '~> 1.0.0' }
+          before { subject.add_gem 'tweezer', version: '~> 1.0.0' }
 
           it 'adds the gem to the right place' do
             expect(subject.dump).to eq <<-RUBY.strip_heredoc
@@ -135,7 +135,7 @@ describe Tweezer::Gemfile do
 
         context 'for a gemfile with group blocks' do
           subject { described_class.new(gemfile_with_multiple_groups) }
-          before { subject.add_gem 'tweezer', '~> 1.0.0' }
+          before { subject.add_gem 'tweezer', version: '~> 1.0.0' }
 
           it 'adds the gem to the right place' do
             expect(subject.dump).to eq <<-RUBY.strip_heredoc
@@ -160,7 +160,9 @@ describe Tweezer::Gemfile do
       context 'with a groups option' do
         context 'to a basic gemfile' do
           subject { described_class.new(basic_gemfile) }
-          before { subject.add_gem 'tweezer', '~> 1.0.0', groups: [:test] }
+          before do
+            subject.add_gem 'tweezer', version: '~> 1.0.0', groups: [:test]
+          end
 
           it 'adds the gem with the group description' do
             expect(subject.dump).to eq <<-RUBY.strip_heredoc
@@ -175,7 +177,7 @@ describe Tweezer::Gemfile do
 
     context 'for a gemfile with source blocks' do
       subject { described_class.new(gemfile_with_sources) }
-      before { subject.add_gem 'tweezer', '~> 1.0.0' }
+      before { subject.add_gem 'tweezer', version: '~> 1.0.0' }
 
       it 'adds the gem to the right place' do
         expect(subject.dump).to eq <<-RUBY.strip_heredoc
@@ -194,7 +196,7 @@ describe Tweezer::Gemfile do
     context 'for a gemfile with groups' do
       subject { described_class.new(gemfile_with_group) }
       context 'for a basic gem' do
-        before { subject.add_gem 'tweezer', '~> 1.0.0' }
+        before { subject.add_gem 'tweezer', version: '~> 1.0.0' }
 
         it 'adds the gem to the right place' do
           expect(subject.dump).to eq <<-RUBY.strip_heredoc

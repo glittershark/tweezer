@@ -2,20 +2,14 @@ module Tweezer
   class Gem
     include Tweezer::ASTHelper
 
-    def initialize(node_or_name, version = nil, opts = {})
+    def initialize(node_or_name, opts = {})
       return init_from_node(node_or_name) if node_or_name.is_a?(
         Parser::AST::Node)
 
       @name = node_or_name
-
-      if version.is_a? Hash
-        @version = nil
-        opts = version
-      else
-        @version = version
-      end
-
+      @version = opts[:version]
       @groups = opts[:groups]
+      @opts = opts
     end
 
     def to_node
