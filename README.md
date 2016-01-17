@@ -16,6 +16,7 @@ gem install tweezer
 
 ## Usage
 
+### Adding new gems - `tweezer add`
 ```sh
 tweezer add rake # Adds rake to the end of the default group in your Gemfile
 
@@ -25,6 +26,15 @@ tweezer add rake '~> 0.9.6' # Adds rake ~> 0.9.6 to the end of the default group
 tweezer add rspec --group test # Adds rspec to the 'test' group in your gemfile.
                                # Tweezer will do this in a way that results in
                                # the most idiomatic possible Gemfile
+```
+
+### Changing attributes of existing gems - `tweezer alter`
+```sh
+tweezer alter rake -v '~> 10.4.2' # Changes rake in the gemfile to be pinned to
+                                  # 10.4.2
+
+tweezer alter rake -p '~/code/rake' # Changes rake in the gemfile to be
+                                    # installed from `~/code/rake`
 ```
 
 For further documentation, run `tweezer help` and `tweezer help COMMAND`.
