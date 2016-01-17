@@ -68,6 +68,13 @@ describe Tweezer::Gem do
     end
   end
 
+  describe '#alter!' do
+    subject { described_class.new 'test' }
+    before { subject.alter! version: '~> 1.0.0', path: '~/code/test' }
+    its(:version) { is_expected.to eq '~> 1.0.0' }
+    its(:path) { is_expected.to eq '~/code/test' }
+  end
+
   describe '#to_node' do
     context 'with just a name' do
       subject { described_class.new('tweezer').to_node }

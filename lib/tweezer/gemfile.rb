@@ -58,7 +58,7 @@ module Tweezer
     def alter_gem(name, **options)
       gem = gems.find { |g| g.name == name } || fail(GemNotPresent)
       old_node = gem.to_node
-      gem.version = options[:version]
+      gem.alter!(options)
       replace_gem!(old_node, gem.to_node)
     end
 

@@ -7,6 +7,10 @@ module Tweezer
         Parser::AST::Node)
 
       @name = node_or_name
+      alter!(opts)
+    end
+
+    def alter!(opts)
       @version = opts[:version]
       @groups = opts[:groups]
       @path = opts[:path]

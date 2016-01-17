@@ -294,6 +294,17 @@ describe Tweezer::Gemfile do
             RUBY
           end
         end
+
+        context 'changing the path' do
+          before { subject.alter_gem 'test1', path: '~/code/test1' }
+
+          it "adds the gem's version to the gemfile source" do
+            expect(subject.dump).to eq <<-RUBY.strip_heredoc
+              gem 'test1', path: '~/code/test1'
+              gem 'test2', '~> 1.0'
+            RUBY
+          end
+        end
       end
     end
   end
