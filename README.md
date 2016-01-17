@@ -1,6 +1,7 @@
 # Tweezer [![Build Status](https://travis-ci.org/glittershark/tweezer.svg?branch=master)](https://travis-ci.org/glittershark/tweezer)
 
-**Tweezer** is a CLI tool for editing your Gemfile.
+**Tweezer** is a CLI tool for editing your Gemfile that goes to great extents to
+ensure the Gemfile remains both valid and idiomatic
 
 Tweezer is currently usable, but should be considered a WIP in that it's
 reasonably untested and might muck up your Gemfile in any number of nasty ways
