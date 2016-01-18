@@ -305,6 +305,17 @@ describe Tweezer::Gemfile do
             RUBY
           end
         end
+
+        context 'when the gem already has options set' do
+          before { subject.alter_gem 'test2', path: '~/code/test2' }
+
+          it 'alters the gem in-line, preserving existing options' do
+            expect(subject.dump).to eq <<-RUBY.strip_heredoc
+              gem 'test1'
+              gem 'test2', '~> 1.0', path: '~/code/test2'
+            RUBY
+          end
+        end
       end
     end
   end

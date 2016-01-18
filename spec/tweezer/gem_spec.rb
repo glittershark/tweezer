@@ -69,10 +69,11 @@ describe Tweezer::Gem do
   end
 
   describe '#alter!' do
-    subject { described_class.new 'test' }
+    subject { described_class.new 'test', groups: [:development] }
     before { subject.alter! version: '~> 1.0.0', path: '~/code/test' }
     its(:version) { is_expected.to eq '~> 1.0.0' }
     its(:path) { is_expected.to eq '~/code/test' }
+    its(:groups) { are_expected.to eq [:development] }
   end
 
   describe '#to_node' do

@@ -11,10 +11,10 @@ module Tweezer
     end
 
     def alter!(opts)
-      @version = opts[:version]
-      @groups = opts[:groups]
-      @path = opts[:path]
-      @opts = opts
+      @version = opts[:version] if opts[:version]
+      @groups = opts[:groups] if opts[:groups]
+      @path = opts[:path] if opts[:path]
+      @opts = (@opts || {}).merge(opts)
     end
 
     def to_node
