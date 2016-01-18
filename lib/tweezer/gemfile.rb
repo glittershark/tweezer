@@ -1,4 +1,4 @@
-r/equire 'bundler'
+require 'bundler'
 require 'parser/current'
 require 'unparser'
 
