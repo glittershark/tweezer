@@ -57,7 +57,8 @@ it from serving my use-case:
 
 My original use-case was for local-development of a gem that was used by one of
 my apps, which required rather frequently switching my gemfile between `gem
-'mygem', '~> 1.0.0'` and `gem 'mygem', path: '/path/to/local/gem'`.
+'mygem', '~> 1.0.0'` and `gem 'mygem', path: '/path/to/local/gem'`. I wanted to
+automate that using a mapping in my editor, and here we are.
 
 [Gemrat]: https://github.com/DruRly/gemrat
 [parser]: https://github.com/whitequark/parser
